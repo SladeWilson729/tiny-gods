@@ -10,7 +10,6 @@ import AudioUpload from './pages/AudioUpload';
 import Victory from './pages/Victory';
 import Store from './pages/Store';
 import Achievements from './pages/Achievements';
-import RelicSelectionModal from './pages/RelicSelectionModal';
 import HallOfEchoes from './pages/HallOfEchoes';
 import RewardsShop from './pages/RewardsShop';
 import Profile from './pages/Profile';
@@ -32,7 +31,6 @@ export const PAGES = {
     "Victory": Victory,
     "Store": Store,
     "Achievements": Achievements,
-    "RelicSelectionModal": RelicSelectionModal,
     "HallOfEchoes": HallOfEchoes,
     "RewardsShop": RewardsShop,
     "Profile": Profile,
