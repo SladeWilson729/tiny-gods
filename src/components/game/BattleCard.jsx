@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Swords, Heart, Shield, Zap, Flame, Star, BookOpen, Skull, TrendingUp, Coins, X, Sparkles, Zap as ChargeIcon, Droplet, Bolt } from 'lucide-react';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
@@ -344,17 +344,6 @@ export default React.memo(function BattleCard({ card, onPlay, disabled, index, g
 
           {/* Bottom decorative border */}
           <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#8b7355] via-[#d4af37] to-[#8b7355]" />
-
-          <style jsx>{`
-            @keyframes shimmer {
-              0% {
-                transform: translateX(-100%) rotate(45deg);
-              }
-              100% {
-                transform: translateX(100%) rotate(45deg);
-              }
-            }
-          `}</style>
         </motion.div>
       </HoverCardTrigger>
 

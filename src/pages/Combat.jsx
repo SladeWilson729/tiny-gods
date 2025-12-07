@@ -1,4 +1,3 @@
-
 import React, { useReducer, useEffect, useCallback, useMemo, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -19,7 +18,7 @@ import DeckVisual from '../components/game/DeckVisual'; // Added for deck visual
 
 // IMPORTANT: combatReducer and initialCombatState must be updated to include 'lastCardTypePlayed' in state
 // and combatActions must include 'UPDATE_COMBAT_STATE' for this feature to work.
-import { combatReducer, initialCombatState, combatActions } from '../components/game/combatReducer.js';
+import { combatReducer, initialCombatState, combatActions } from '../components/game/combatReducer';
 import {
   calculateShield,
   calculateHealing,
