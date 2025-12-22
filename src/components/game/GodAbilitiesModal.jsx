@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Card } from '@/components/ui/card';
@@ -7,7 +6,7 @@ import { motion } from 'framer-motion';
 
 const GOD_TALENTS = {
   Athena: {
-    static_ability: "When you play a Shield card, gain 1 Energy.",
+    static_ability: "Athena's Aegis : Gain shield equal to half damage dealt.",
     tier1: {
       calculated_strike: {
         name: "Calculated Strike",
