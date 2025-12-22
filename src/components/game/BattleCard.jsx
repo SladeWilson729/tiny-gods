@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Swords, Heart, Shield, Zap, Flame, Star, BookOpen, Skull, TrendingUp, Coins, X, Sparkles, Zap as ChargeIcon, Droplet, Bolt } from 'lucide-react';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
@@ -72,11 +72,11 @@ export default React.memo(function BattleCard({ card, onPlay, disabled, index, g
   const finalCost = Math.max(0, card.cost - totalCostReduction);
   const showCostReduction = totalCostReduction > 0;
   
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     if (!disabled && onPlay && typeof onPlay === 'function') {
       onPlay();
     }
-  };
+  }, [disabled, onPlay]);
 
   const isComboGlowing = hasCombo && comboActive;
   const isChargeGlowing = hasCharge && chargeStacks > 0;

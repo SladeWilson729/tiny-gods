@@ -1620,14 +1620,14 @@ export default function Combat() {
     
     // Perform the initial card draw, one by one with animation
     for (let i = 0; i < initialDrawCount; i++) {
-        await new Promise(resolve => setTimeout(resolve, 150));
+        await new Promise(resolve => setTimeout(resolve, 80));
         if (!isMountedRef.current || isNavigating) {
           dispatch({ type: combatActions.SET_ANIMATING, payload: false });
           return;
         }
-        drawCardsWithAbilities(1); // Call the existing function to draw 1 card
+        drawCardsWithAbilities(1);
     }
-    cardsDrawnThisTurn += initialDrawCount; // Update count for subsequent talent checks
+    cardsDrawnThisTurn += initialDrawCount;
 
     if (state.god?.name === 'Quetzalcoatl' && state.godTalents?.tier1 === 'serpent_wisdom') {
       drawCardsWithAbilities(1);
@@ -1765,10 +1765,10 @@ export default function Combat() {
     const hasDisorientingAura = currentCombatState.enemy.affixes?.some(a => a.effect === 'disorienting_aura');
     if (hasDisorientingAura && Math.random() < 0.3) {
       addLog('😵 Disorienting Aura: Your attack misses!', 'enemy');
-      await new Promise(resolve => setTimeout(resolve, 600));
+      await new Promise(resolve => setTimeout(resolve, 300));
       if (!isMountedRef.current || isNavigating) {
         dispatch({ type: combatActions.SET_ANIMATING, payload: false });
-        return; // Damage effects are skipped
+        return;
       }
       return;
     }
@@ -1904,7 +1904,7 @@ export default function Combat() {
       addLog('💃 Dance of Annihilation consumed!', 'info');
     }
 
-    // Check if enemy defeated after damage
+    // Check if enemy defeated after damage (immediate)
     setTimeout(() => {
       if (!isMountedRef.current || isNavigating) {
         dispatch({ type: combatActions.SET_ANIMATING, payload: false });
@@ -1915,7 +1915,7 @@ export default function Combat() {
         console.log('[playCard] Enemy defeated!');
         handleVictoryAndProgressRun();
       }
-    }, 100);
+    }, 50);
   }, [addLog, dispatch, handleVictoryAndProgressRun, staticHandlers, latestStateRef, isMountedRef, isNavigating, drawCardsWithAbilities]);
 
 
@@ -1925,13 +1925,9 @@ export default function Combat() {
       console.log('[playCard] Already navigating away, ignoring card play');
       return;
     }
-    // No need to check isPlayerTurn here as handlePlayCard already does, and we are now processing.
 
-    // Store the type of card being played
     const cardTypePlayed = card.type;
-    const currentLastCardTypePlayed = latestStateRef.current.lastCardTypePlayed; // Use latestStateRef.current
-
-    // Create a copy of the card to potentially modify
+    const currentLastCardTypePlayed = latestStateRef.current.lastCardTypePlayed;
     let cardToPlay = { ...card };
 
     // Tier 4: Quetzalcoatl Serpent's Momentum - Every 3rd card gains Surge and Charge 2
@@ -2130,77 +2126,29 @@ export default function Combat() {
       }
     }
 
-    // Track card effect stats for quests
-    const trackCardEffects = async () => {
+    // Track card effect stats async (non-blocking)
+    Promise.resolve().then(async () => {
       try {
         const user = await base44.auth.me();
         const updates = {};
         
-        // Track combo cards
-        if (comboActive) {
-          updates.total_combo_cards_played = (user.total_combo_cards_played || 0) + 1;
-        }
+        if (comboActive) updates.total_combo_cards_played = (user.total_combo_cards_played || 0) + 1;
+        if (isSurgeActive) updates.total_surge_cards_played = (user.total_surge_cards_played || 0) + 1;
+        if (cardToPlay.chargeValue && cardToPlay.chargeStacks > 0) updates.total_charge_cards_played = (user.total_charge_cards_played || 0) + 1;
+        if (cardToPlay.knowledgeType && cardToPlay.knowledgeValue > 0) updates.total_knowledge_cards_played = (user.total_knowledge_cards_played || 0) + 1;
+        if (cardToPlay.applyLeech) updates.total_leech_cards_played = (user.total_leech_cards_played || 0) + 1;
+        if (cardToPlay.applyBurn && cardToPlay.applyBurn > 0) updates.total_burn_cards_played = (user.total_burn_cards_played || 0) + 1;
+        if (cardToPlay.applyPoison && cardToPlay.applyPoison > 0) updates.total_poison_cards_played = (user.total_poison_cards_played || 0) + 1;
+        if (cardToPlay.applyVulnerable) updates.total_vulnerable_cards_played = (user.total_vulnerable_cards_played || 0) + 1;
+        if (cardToPlay.applyStun) updates.total_stun_cards_played = (user.total_stun_cards_played || 0) + 1;
+        if (cardToPlay.applyConfused && cardToPlay.applyConfused > 0) updates.total_confused_cards_played = (user.total_confused_cards_played || 0) + 1;
+        if (cardToPlay.selfDamage && cardToPlay.selfDamage > 0) updates.total_self_damage_cards_played = (user.total_self_damage_cards_played || 0) + 1;
         
-        // Track surge cards
-        if (isSurgeActive) {
-          updates.total_surge_cards_played = (user.total_surge_cards_played || 0) + 1;
-        }
-        
-        // Track charge cards
-        if (cardToPlay.chargeValue && cardToPlay.chargeStacks > 0) {
-          updates.total_charge_cards_played = (user.total_charge_cards_played || 0) + 1;
-        }
-        
-        // Track knowledge cards
-        if (cardToPlay.knowledgeType && cardToPlay.knowledgeValue > 0) {
-          updates.total_knowledge_cards_played = (user.total_knowledge_cards_played || 0) + 1;
-        }
-        
-        // Track leech cards
-        if (cardToPlay.applyLeech) {
-          updates.total_leech_cards_played = (user.total_leech_cards_played || 0) + 1;
-        }
-        
-        // Track burn cards
-        if (cardToPlay.applyBurn && cardToPlay.applyBurn > 0) {
-          updates.total_burn_cards_played = (user.total_burn_cards_played || 0) + 1;
-        }
-        
-        // Track poison cards
-        if (cardToPlay.applyPoison && cardToPlay.applyPoison > 0) {
-          updates.total_poison_cards_played = (user.total_poison_cards_played || 0) + 1;
-        }
-        
-        // Track vulnerable cards
-        if (cardToPlay.applyVulnerable) {
-          updates.total_vulnerable_cards_played = (user.total_vulnerable_cards_played || 0) + 1;
-        }
-        
-        // Track stun cards
-        if (cardToPlay.applyStun) {
-          updates.total_stun_cards_played = (user.total_stun_cards_played || 0) + 1;
-        }
-        
-        // Track confused cards
-        if (cardToPlay.applyConfused && cardToPlay.applyConfused > 0) {
-          updates.total_confused_cards_played = (user.total_confused_cards_played || 0) + 1;
-        }
-        
-        // Track self-damage cards
-        if (cardToPlay.selfDamage && cardToPlay.selfDamage > 0) {
-          updates.total_self_damage_cards_played = (user.total_self_damage_cards_played || 0) + 1;
-        }
-        
-        if (Object.keys(updates).length > 0) {
-          await base44.auth.updateMe(updates);
-        }
+        if (Object.keys(updates).length > 0) await base44.auth.updateMe(updates);
       } catch (error) {
         console.error('[playCard] Error tracking card effects:', error);
       }
-    };
-    
-    // Track in background without blocking gameplay
-    trackCardEffects();
+    });
 
     // Blood Stone relic - Take 5 damage when playing any card
     const hasBloodStone = latestStateRef.current.relics?.some(r => r.name === "Blood Stone");
@@ -2210,7 +2158,7 @@ export default function Combat() {
       dispatch({ type: combatActions.DAMAGE_PLAYER, payload: { amount: bloodStoneDamage } });
       addLog(`💀 Blood Stone: You take ${bloodStoneDamage} damage!`, 'damage');
       
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise(resolve => setTimeout(resolve, 150));
       if (!isMountedRef.current || isNavigating) {
         dispatch({ type: combatActions.SET_ANIMATING, payload: false });
         return;
@@ -2221,7 +2169,7 @@ export default function Combat() {
         checkAnubisEternalBalance(damageToHealth);
       }
 
-      // Check if player died from Blood Stone
+      // Check if player died from Blood Stone (no delay for instant feedback)
       if (latestStateRef.current.player.health <= 0) {
         let playerSaved = false;
         
@@ -2242,11 +2190,6 @@ export default function Combat() {
             } else {
               addLog(`💀🛡️ Underworld Resilience: Anubis restored to ${restoredHealth} HP!`, 'special');
             }
-            await new Promise(resolve => setTimeout(resolve, 100));
-            if (!isMountedRef.current || isNavigating) {
-              dispatch({ type: combatActions.SET_ANIMATING, payload: false });
-              return;
-            }
             playerSaved = true;
           }
         }
@@ -2257,11 +2200,6 @@ export default function Combat() {
             dispatch({ type: combatActions.UPDATE_PLAYER, payload: { health: 1 } });
             dispatch({ type: combatActions.UPDATE_GOD_STATE, payload: { phoenixFeatherUsed: true } });
             addLog('🔥🐦 Phoenix Feather: Restored to 1 HP!', 'special');
-            await new Promise(resolve => setTimeout(resolve, 100));
-            if (!isMountedRef.current || isNavigating) {
-              dispatch({ type: combatActions.SET_ANIMATING, payload: false });
-              return;
-            }
             playerSaved = true;
           }
         }
@@ -2653,10 +2591,10 @@ export default function Combat() {
 
       const previousPlayerHealth = latestStateRef.current.player.health;
       dispatch({ type: combatActions.DAMAGE_PLAYER, payload: { amount: selfDamageAmount } });
-      addLog(`You took ${selfDamageAmount} self-damage from ${cardToPlay.name}!`, 'damage'); // Use cardToPlay here
-      await new Promise(resolve => setTimeout(resolve, 300));
+      addLog(`You took ${selfDamageAmount} self-damage from ${cardToPlay.name}!`, 'damage');
+      await new Promise(resolve => setTimeout(resolve, 150));
       if (!isMountedRef.current || isNavigating) {
-        dispatch({ type: combatActions.SET_ANIMATING, payload: false }); // Unblock UI
+        dispatch({ type: combatActions.SET_ANIMATING, payload: false });
         return;
       }
       
@@ -2751,21 +2689,24 @@ export default function Combat() {
       payload: { lastCardTypePlayed: cardTypePlayed }
     });
 
-    // Trigger on_card_played companions (add before final SET_ANIMATING false)
+    // Trigger on_card_played companions
     if (companionSystem) {
-      const user = await base44.auth.me(); // Fetch user for blessings
-      companionSystem.trigger(
-        { type: 'on_card_played', card: cardToPlay }, // Pass cardToPlay in the event object
-        {
-          ...latestStateRef.current, // Pass the entire current state as combatState
-          chosenBlessings: user.companion_chosen_blessings || {},
-        },
-        dispatch,
-        combatActions
-      );
+      base44.auth.me().then(user => {
+        if (isMountedRef.current) {
+          companionSystem.trigger(
+            { type: 'on_card_played', card: cardToPlay },
+            {
+              ...latestStateRef.current,
+              chosenBlessings: user.companion_chosen_blessings || {},
+            },
+            dispatch,
+            combatActions
+          );
+        }
+      }).catch(e => console.error('[playCard] Companion trigger error:', e));
     }
 
-    dispatch({ type: combatActions.SET_ANIMATING, payload: false }); // Unblock UI
+    dispatch({ type: combatActions.SET_ANIMATING, payload: false });
   }, [addLog, handleVictoryAndProgressRun, handleDefeat, dispatch, drawCardsWithAbilities, calculateDamage, calculateShield, calculateHealing, latestStateRef, isMountedRef, isNavigating, wouldBeLastCard, checkAnubisEternalBalance, staticHandlers, processDamageEffects, companionSystem]);
 
   const handlePlayCard = useCallback(async (card, cardIndex) => {
@@ -3481,7 +3422,7 @@ export default function Combat() {
 
     dispatch({ type: combatActions.DAMAGE_PLAYER, payload: { amount: attackDamage } });
     addLog(`${state.enemy.name} attacks for ${attackDamage} damage!`, 'enemy');
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await new Promise(resolve => setTimeout(resolve, 200));
     if (!isMountedRef.current || isNavigating) {
       dispatch({ type: combatActions.SET_ANIMATING, payload: false });
       return;
