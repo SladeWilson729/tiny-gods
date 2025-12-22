@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
@@ -6,7 +5,7 @@ import { Progress } from '@/components/ui/progress';
 import { Skull, Swords, Shield, Flame } from 'lucide-react';
 
 // Memoize to prevent unnecessary re-renders
-export default React.memo(function EnemyDisplay({ enemy, damageAnimation }) {
+const EnemyDisplay = React.memo(function EnemyDisplay({ enemy, damageAnimation }) {
   const healthPercent = (enemy.health / enemy.maxHealth) * 100;
 
   const isVideo = (url) => {
@@ -186,4 +185,6 @@ export default React.memo(function EnemyDisplay({ enemy, damageAnimation }) {
       </Card>
     </div>
   );
-});
+  });
+
+  export default EnemyDisplay;

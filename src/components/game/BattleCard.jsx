@@ -113,10 +113,7 @@ export default React.memo(function BattleCard({ card, onPlay, disabled, index, g
     <HoverCard openDelay={200} closeDelay={100}>
       <HoverCardTrigger asChild>
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.8 }}
-          transition={{ delay: index * 0.03 }}
+          initial={false}
           whileHover={{ scale: disabled ? 1 : 1.05, y: disabled ? 0 : -8 }}
           onClick={handleClick}
           className={`relative overflow-hidden w-40 sm:w-48 h-72 sm:h-80 cursor-pointer ${

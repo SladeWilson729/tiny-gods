@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card'; // Added CardContent
 import { Heart, Shield, Zap, Sparkles, Skull, UserIcon } from 'lucide-react'; // Added UserIcon
@@ -7,7 +6,7 @@ import { ShieldCheck, HeartPulse, BookOpen, BrainCircuit, Trophy, ShoppingBag, G
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 
 // Memoize to prevent unnecessary re-renders
-export default React.memo(function PlayerStatus({
+const PlayerStatus = React.memo(function PlayerStatus({
   health,
   maxHealth,
   shield,
@@ -234,9 +233,26 @@ export default React.memo(function PlayerStatus({
       </CardContent>
     </Card>
   );
-});
+  }, (prevProps, nextProps) => {
+  // Custom comparison for performance
+  return prevProps.health === nextProps.health &&
+         prevProps.maxHealth === nextProps.maxHealth &&
+         prevProps.shield === nextProps.shield &&
+         prevProps.energy === nextProps.energy &&
+         prevProps.maxEnergy === nextProps.maxEnergy &&
+         prevProps.burnStacks === nextProps.burnStacks &&
+         prevProps.poisonStacks === nextProps.poisonStacks &&
+         prevProps.necromancyStacks === nextProps.necromancyStacks &&
+         prevProps.damageReflection === nextProps.damageReflection &&
+         prevProps.susanooWrathStacks === nextProps.susanooWrathStacks &&
+         prevProps.anubisEternalBalanceStacks === nextProps.anubisEternalBalanceStacks &&
+         prevProps.relics?.length === nextProps.relics?.length &&
+         prevProps.odinRunesUsedThisBattle === nextProps.odinRunesUsedThisBattle;
+  });
 
-const iconMap = {
+  export default PlayerStatus;
+
+  const iconMap = {
   ShieldCheck,
   HeartPulse,
   BookOpen,
