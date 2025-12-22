@@ -325,40 +325,40 @@ export default function GodSelection() {
         playerData={user}
       />
 
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto px-2 sm:px-0">
         {livesData && (
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6"
+            className="mb-4 sm:mb-6"
           >
             <Card className="bg-black/60 border-2 border-red-500/50 backdrop-blur-md">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Heart className="w-6 h-6 text-red-400" />
-                    <div>
+              <CardContent className="p-3 sm:p-4">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 w-full sm:w-auto">
+                    <Heart className="w-6 h-6 sm:w-7 sm:h-7 text-red-400 flex-shrink-0" />
+                    <div className="flex-1">
                       <div className="flex items-center gap-2">
                         {[...Array(livesData.maxLives)].map((_, i) => (
                           <Heart
                             key={i}
-                            className={`w-5 h-5 ${i < livesData.lives ? 'text-red-500 fill-red-500' : 'text-gray-600'}`}
+                            className={`w-6 h-6 sm:w-5 sm:h-5 ${i < livesData.lives ? 'text-red-500 fill-red-500' : 'text-gray-600'}`}
                           />
                         ))}
-                        <span className="text-white font-bold ml-2">
+                        <span className="text-white font-bold ml-2 text-lg sm:text-base">
                           {livesData.lives} / {livesData.maxLives}
                         </span>
                       </div>
                       {livesData.lives < livesData.maxLives && livesData.nextRecoveryIn && (
-                        <p className="text-xs text-gray-400 mt-1">
+                        <p className="text-xs sm:text-sm text-gray-400 mt-1">
                           Next life in {livesData.nextRecoveryIn} minute{livesData.nextRecoveryIn !== 1 ? 's' : ''}
                         </p>
                       )}
                     </div>
                   </div>
                   {livesData.lives <= 0 && (
-                    <div className="text-right">
-                      <p className="text-red-400 font-bold">Out of Lives!</p>
+                    <div className="text-center sm:text-right">
+                      <p className="text-red-400 font-bold text-base sm:text-sm">Out of Lives!</p>
                       <p className="text-xs text-gray-400">Recovers 1 per hour</p>
                     </div>
                   )}
@@ -371,43 +371,43 @@ export default function GodSelection() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12 relative"
+          className="text-center mb-6 sm:mb-8 md:mb-12"
         >
-          <div className="bg-black/70 backdrop-blur-md rounded-2xl p-6 inline-block border-2 border-amber-500/50 shadow-2xl">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)]">
+          <div className="bg-black/70 backdrop-blur-md rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 border-amber-500/50 shadow-2xl">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 sm:mb-4 drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)]">
               Choose Your Deity
             </h1>
-            <p className="text-lg md:text-xl text-amber-200 font-semibold drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)]">
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-amber-200 font-semibold drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)]">
               Select the god who will champion your cause
             </p>
           </div>
-          <div className="absolute top-0 right-0 flex flex-col sm:flex-row gap-2">
-            {hasCompletedRun && (
-              <>
-                <Button
-                  onClick={() => setShowTalentTree(true)}
-                  variant="outline"
-                  className="bg-black/80 backdrop-blur-sm border-cyan-500 text-cyan-300 hover:bg-cyan-500/20 hover:text-white shadow-lg"
-                  disabled={isCreatingRun}
-                >
-                  <Shield className="w-4 h-4 mr-2" />
-                  Talent Trees
-                </Button>
-                <Button
-                  onClick={() => setShowCompanionLoadout(true)}
-                  variant="outline"
-                  className="bg-black/80 backdrop-blur-sm border-purple-500 text-purple-300 hover:bg-purple-500/20 hover:text-white shadow-lg"
-                  disabled={isCreatingRun}
-                >
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Companions
-                </Button>
-              </>
-            )}
-          </div>
+          {hasCompletedRun && (
+            <div className="flex justify-center gap-2 mt-4">
+              <Button
+                onClick={() => setShowTalentTree(true)}
+                variant="outline"
+                size="sm"
+                className="bg-black/80 backdrop-blur-sm border-cyan-500 text-cyan-300 hover:bg-cyan-500/20 hover:text-white shadow-lg text-xs sm:text-sm min-h-[44px]"
+                disabled={isCreatingRun}
+              >
+                <Shield className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Talent Trees</span>
+              </Button>
+              <Button
+                onClick={() => setShowCompanionLoadout(true)}
+                variant="outline"
+                size="sm"
+                className="bg-black/80 backdrop-blur-sm border-purple-500 text-purple-300 hover:bg-purple-500/20 hover:text-white shadow-lg text-xs sm:text-sm min-h-[44px]"
+                disabled={isCreatingRun}
+              >
+                <Sparkles className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Companions</span>
+              </Button>
+            </div>
+          )}
         </motion.div>
 
-        <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-8 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
           {isLoading ? (
             Array.from({ length: 12 }).map((_, index) => (
               <Skeleton key={index} className="w-full aspect-[3/4] rounded-2xl bg-gray-700/50" />
@@ -442,9 +442,9 @@ export default function GodSelection() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
-                className="flex items-center justify-center space-x-6 my-6 flex-wrap gap-4"
+                className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 my-6 px-2"
             >
-                <div className="bg-black/80 backdrop-blur-md rounded-full px-6 py-3 flex items-center space-x-3 border-2 border-red-500/50 shadow-lg">
+                <div className="bg-black/80 backdrop-blur-md rounded-full px-4 sm:px-6 py-3 sm:py-3 flex items-center justify-between sm:justify-start space-x-3 border-2 border-red-500/50 shadow-lg min-h-[52px]">
                   <Switch
                       id="hard-mode-toggle"
                       checked={isHardMode}
@@ -458,13 +458,13 @@ export default function GodSelection() {
                       className="data-[state=checked]:bg-red-600"
                       disabled={isCreatingRun}
                   />
-                  <Label htmlFor="hard-mode-toggle" className="text-xl font-bold text-red-300 cursor-pointer drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+                  <Label htmlFor="hard-mode-toggle" className="text-base sm:text-lg md:text-xl font-bold text-red-300 cursor-pointer drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
                       Hard Mode
                   </Label>
                 </div>
 
                 {hasWonHardMode && (
-                    <div className={`bg-black/80 backdrop-blur-md rounded-full px-6 py-3 flex items-center space-x-3 border-2 shadow-lg ${isHardMode ? 'border-purple-500/50' : 'border-gray-600/50'}`}>
+                    <div className={`bg-black/80 backdrop-blur-md rounded-full px-4 sm:px-6 py-3 sm:py-3 flex items-center justify-between sm:justify-start space-x-3 border-2 shadow-lg min-h-[52px] ${isHardMode ? 'border-purple-500/50' : 'border-gray-600/50'}`}>
                       <Switch
                           id="heroic-mode-toggle"
                           checked={isHeroicMode}
@@ -477,7 +477,7 @@ export default function GodSelection() {
                           disabled={!isHardMode || isCreatingRun}
                           className="data-[state=checked]:bg-purple-600"
                       />
-                      <Label htmlFor="heroic-mode-toggle" className={`text-xl font-bold cursor-pointer drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] ${isHardMode ? 'text-purple-300' : 'text-gray-500'}`}>
+                      <Label htmlFor="heroic-mode-toggle" className={`text-base sm:text-lg md:text-xl font-bold cursor-pointer drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] ${isHardMode ? 'text-purple-300' : 'text-gray-500'}`}>
                           Heroic Mode
                       </Label>
                     </div>
@@ -485,7 +485,7 @@ export default function GodSelection() {
 
                 {hasWonHeroicMode && (
                     <motion.div
-                      className={`bg-black/80 backdrop-blur-md rounded-full px-6 py-3 flex items-center space-x-3 border-2 shadow-lg ${isHardMode && isHeroicMode ? 'border-amber-500/50' : 'border-gray-600/50'}`}
+                      className={`bg-black/80 backdrop-blur-md rounded-full px-4 sm:px-6 py-3 sm:py-3 flex items-center justify-between sm:justify-start space-x-3 border-2 shadow-lg min-h-[52px] ${isHardMode && isHeroicMode ? 'border-amber-500/50' : 'border-gray-600/50'}`}
                       animate={isHardMode && isHeroicMode ? {
                         boxShadow: [
                           '0 0 20px rgba(245, 158, 11, 0.3)',
@@ -502,13 +502,13 @@ export default function GodSelection() {
                           disabled={!isHardMode || !isHeroicMode || isCreatingRun}
                           className="data-[state=checked]:bg-amber-600"
                       />
-                      <Label htmlFor="mythic-mode-toggle" className={`text-xl font-bold cursor-pointer drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] ${isHardMode && isHeroicMode ? 'text-amber-300' : 'text-gray-500'}`}>
+                      <Label htmlFor="mythic-mode-toggle" className={`text-base sm:text-lg md:text-xl font-bold cursor-pointer drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] ${isHardMode && isHeroicMode ? 'text-amber-300' : 'text-gray-500'}`}>
                           Mythic Mode
                       </Label>
                     </motion.div>
                 )}
 
-                <div className="bg-black/80 backdrop-blur-md rounded-full px-6 py-3 flex items-center space-x-3 border-2 border-cyan-500/50 shadow-lg">
+                <div className="bg-black/80 backdrop-blur-md rounded-full px-4 sm:px-6 py-3 sm:py-3 flex items-center justify-between sm:justify-start space-x-3 border-2 border-cyan-500/50 shadow-lg min-h-[52px]">
                   <Switch
                       id="wild-mode-toggle"
                       checked={isWildMode}
@@ -516,7 +516,7 @@ export default function GodSelection() {
                       className="data-[state=checked]:bg-cyan-600"
                       disabled={isCreatingRun}
                   />
-                  <Label htmlFor="wild-mode-toggle" className="text-xl font-bold text-cyan-300 cursor-pointer drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+                  <Label htmlFor="wild-mode-toggle" className="text-base sm:text-lg md:text-xl font-bold text-cyan-300 cursor-pointer drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
                       Wild Mode
                   </Label>
                 </div>
@@ -527,7 +527,7 @@ export default function GodSelection() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
-          className="text-center space-y-4"
+          className="flex flex-col items-center space-y-3 px-2"
         >
           <Button
             onClick={() => {
@@ -539,17 +539,17 @@ export default function GodSelection() {
             }}
             disabled={!chosenGod || isLoading || isStarting || isCreatingRun}
             size="lg"
-            className="w-full max-w-md font-bold text-xl px-12 py-6 bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 hover:from-purple-700 hover:via-pink-700 hover:to-red-700 border-2 border-purple-800 text-white shadow-2xl"
+            className="w-full max-w-md font-bold text-base sm:text-lg md:text-xl px-6 sm:px-8 md:px-12 py-5 sm:py-6 bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 hover:from-purple-700 hover:via-pink-700 hover:to-red-700 border-2 border-purple-800 text-white shadow-2xl min-h-[56px]"
           >
-            <Sparkles className="w-6 h-6 mr-2" />
-            Custom Deck Mode (20 Battles)
+            <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
+            <span className="text-sm sm:text-base md:text-xl">Custom Deck Mode (20 Battles)</span>
           </Button>
 
           <Button
             onClick={confirmSelection}
             disabled={!chosenGod || isLoading || startingDeck.length === 0 || isStarting || isCreatingRun}
             size="lg"
-            className={`font-bold text-xl px-12 py-6 disabled:opacity-50 shadow-2xl ${
+            className={`w-full max-w-md font-bold text-base sm:text-lg md:text-xl px-6 sm:px-8 md:px-12 py-5 sm:py-6 disabled:opacity-50 shadow-2xl min-h-[56px] ${
               isMythicMode
                 ? 'bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 hover:from-amber-700 hover:via-orange-700 hover:to-red-700 border-2 border-amber-800'
                 : isHeroicMode

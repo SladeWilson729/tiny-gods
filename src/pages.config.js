@@ -1,41 +1,41 @@
-import Home from './pages/Home';
-import GodSelection from './pages/GodSelection';
-import Combat from './pages/Combat';
-import Defeat from './pages/Defeat';
-import RunProgression from './pages/RunProgression';
-import Leaderboard from './pages/Leaderboard';
-import BugReports from './pages/BugReports';
+import Achievements from './pages/Achievements';
 import AdminPanel from './pages/AdminPanel';
 import AudioUpload from './pages/AudioUpload';
-import Victory from './pages/Victory';
-import Store from './pages/Store';
-import Achievements from './pages/Achievements';
+import BugReports from './pages/BugReports';
+import Combat from './pages/Combat';
+import Defeat from './pages/Defeat';
+import GodSelection from './pages/GodSelection';
 import HallOfEchoes from './pages/HallOfEchoes';
-import RewardsShop from './pages/RewardsShop';
+import Home from './pages/Home';
+import Leaderboard from './pages/Leaderboard';
+import PantheonHall from './pages/PantheonHall';
 import Profile from './pages/Profile';
 import Quests from './pages/Quests';
-import PantheonHall from './pages/PantheonHall';
+import RewardsShop from './pages/RewardsShop';
+import RunProgression from './pages/RunProgression';
+import Store from './pages/Store';
+import Victory from './pages/Victory';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
-    "Home": Home,
-    "GodSelection": GodSelection,
-    "Combat": Combat,
-    "Defeat": Defeat,
-    "RunProgression": RunProgression,
-    "Leaderboard": Leaderboard,
-    "BugReports": BugReports,
+    "Achievements": Achievements,
     "AdminPanel": AdminPanel,
     "AudioUpload": AudioUpload,
-    "Victory": Victory,
-    "Store": Store,
-    "Achievements": Achievements,
+    "BugReports": BugReports,
+    "Combat": Combat,
+    "Defeat": Defeat,
+    "GodSelection": GodSelection,
     "HallOfEchoes": HallOfEchoes,
-    "RewardsShop": RewardsShop,
+    "Home": Home,
+    "Leaderboard": Leaderboard,
+    "PantheonHall": PantheonHall,
     "Profile": Profile,
     "Quests": Quests,
-    "PantheonHall": PantheonHall,
+    "RewardsShop": RewardsShop,
+    "RunProgression": RunProgression,
+    "Store": Store,
+    "Victory": Victory,
 }
 
 export const pagesConfig = {
