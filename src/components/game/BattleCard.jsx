@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Swords, Heart, Shield, Zap, Flame, Star, BookOpen, Skull, TrendingUp, Coins, X, Sparkles, Zap as ChargeIcon, Droplet, Bolt } from 'lucide-react';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';

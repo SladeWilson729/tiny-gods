@@ -1179,10 +1179,10 @@ export default function Combat() {
       }
     }
 
-    if (state.god?.name === 'Thor' && state.godTalents?.tier1 === 'press_the_advantage') {
+    if (state.god?.name === 'Thor' && state.godTalents?.tier2 === 'press_the_advantage') {
       if (state.godState.thorPressTheAdvantageReady) {
-        damage += 10;
-        addLog(`⚡ Thor's Press the Advantage: Next damage card will deal +10 damage!`, 'buff');
+        damage += 5;
+        addLog(`⚡ Thor's Press the Advantage: +5 bonus damage!`, 'buff');
         // Logic to reset thorPressTheAdvantageReady is now in playCard
       }
     }
@@ -1805,15 +1805,15 @@ export default function Combat() {
       dispatch({ type: combatActions.UPDATE_GOD_STATE, payload: { thorDamageCardsPlayed: (currentCombatState.godState.thorDamageCardsPlayed || 0) + 1 } });
     }
 
-    // Thor Tier 1: Press the Advantage tracking
-    if (currentCombatState.god?.name === 'Thor' && currentCombatState.godTalents?.tier1 === 'press_the_advantage') {
+    // Thor Tier 2: Press the Advantage tracking
+    if (currentCombatState.god?.name === 'Thor' && currentCombatState.godTalents?.tier2 === 'press_the_advantage') {
       let newCounter = currentCombatState.godState.thorPressTheAdvantageCounter + 1;
       let newReadyState = currentCombatState.godState.thorPressTheAdvantageReady;
 
-      if (newCounter >= 3) {
+      if (newCounter >= 2) {
         newReadyState = true;
         newCounter = 0;
-        addLog(`⚡ Thor's Press the Advantage: Next damage card will deal +10 damage!`, 'buff');
+        addLog(`⚡ Thor's Press the Advantage: Next damage card gets +5 damage!`, 'buff');
       }
 
       dispatch({ type: combatActions.UPDATE_GOD_STATE, payload: {
