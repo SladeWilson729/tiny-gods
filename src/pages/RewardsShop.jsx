@@ -589,7 +589,6 @@ export default function RewardsShop() {
                             isVideo(cosmetic.preview_image) ? (
                               <video
                                 src={cosmetic.preview_image}
-                                alt={cosmetic.name}
                                 className="w-full h-full object-cover"
                                 autoPlay
                                 loop
