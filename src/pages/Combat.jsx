@@ -211,6 +211,11 @@ export default function Combat() {
   }, []);
 
 
+  const getPersistentBaseEnergy = useCallback((currentState) => {
+    const relicBonusEnergy = calculateBonusEnergy({ relics: currentState.relics });
+    return Math.max(1, currentState.player.maxEnergy - relicBonusEnergy);
+  }, [calculateBonusEnergy]);
+
   const handleDefeat = useCallback(() => {
     if (isNavigating) return;
 
@@ -289,7 +294,7 @@ export default function Combat() {
       cthulhu_next_attack_bonus: state.godState.cthulhuNextAttackBonus,
       player_burn_stacks: state.player.burnStacks || 0,
       player_poison_stacks: state.player.poisonStacks || 0,
-      base_energy: state.player.maxEnergy,
+      base_energy: getPersistentBaseEnergy(state),
       last_card_type_played: state.lastCardTypePlayed, // Save last card type played
       athena_aegis_ascendant_used: state.godState.athenaAegisAscendantUsed,
       athena_aegis_ascendant_turns_remaining: state.godState.athenaAegisAscendantTurnsRemaining,
@@ -820,6 +825,14 @@ export default function Combat() {
         if (hasAegisFragment) {
           startingShield += 8;
           console.log('[Combat] Aegis Fragment: +8 starting shield');
+        }
+
+        const hasAegisOfProtection = (playerRelics || []).some(r => r.name === "Aegis of Protection" || r.name === "Aegis of Protection+");
+        const empoweredAegisProtection = (playerRelics || []).some(r => r.name === "Aegis of Protection+");
+        if (hasAegisOfProtection) {
+          const shieldAmount = empoweredAegisProtection ? 15 : 10;
+          startingShield += shieldAmount;
+          addLog(`🛡️ Aegis of Protection: +${shieldAmount} starting Shield!${empoweredAegisProtection ? ' ⚡' : ''}`, 'buff');
         }
 
         if (godData.name === 'Ra' && godTalents.tier2 === 'eternal_sun') {
@@ -1643,14 +1656,6 @@ export default function Combat() {
       addLog('⚡ Thor Lightning Reflexes: Draw 1 extra card', 'buff');
     }
 
-    const hasAegisOfProtection = state.relics?.some(r => r.name === "Aegis of Protection" || r.name === "Aegis of Protection+");
-    const empoweredAegisProtection = state.relics?.some(r => r.name === "Aegis of Protection+");
-    if (hasAegisOfProtection) {
-      const shieldAmount = empoweredAegisProtection ? 15 : 10; // Empowered: +15 instead of +10
-      dispatch({ type: combatActions.GAIN_SHIELD, payload: { amount: shieldAmount } });
-      addLog(`🛡️ Aegis of Protection: +${shieldAmount} Shield!${empoweredAegisProtection ? ' ⚡' : ''}`, 'buff');
-    }
-
     const hasCrownOfWisdom = state.relics?.some(r => r.name === "Crown of Wisdom" || r.name === "Crown of Wisdom+");
     const empoweredCrown = state.relics?.some(r => r.name === "Crown of Wisdom+");
     if (hasCrownOfWisdom) {
@@ -1834,6 +1839,12 @@ export default function Combat() {
     dispatch({ type: combatActions.DAMAGE_ENEMY, payload: { amount: finalDamage } }); // Leech healing is automatically applied in DAMAGE_ENEMY reducer if leechActive
     addLog(`You dealt ${finalDamage} damage with ${cardToPlay.name}!`, 'player');
 
+    if (currentCombatState.enemy.affixes?.some(a => a.effect === 'vengeful_strike') && finalDamage > 0) {
+      const reflectedDamage = Math.floor(finalDamage * 0.5);
+      dispatch({ type: combatActions.DAMAGE_PLAYER, payload: { amount: reflectedDamage } });
+      addLog(`⚔️ Vengeful Strike: You take ${reflectedDamage} reflected damage!`, 'enemy');
+    }
+
     // Trigger damage animation
     dispatch({ type: combatActions.TRIGGER_DAMAGE_ANIMATION });
 
@@ -2005,15 +2016,25 @@ export default function Combat() {
       }
     }
 
+    let hasConditionalShieldBonus = false;
+
     // Apply combo bonus if active
     const comboActive = cardToPlay.comboType && currentLastCardTypePlayed === cardToPlay.comboType;
     if (comboActive && cardToPlay.comboBonus > 0) {
+      const isTacticalResurgence = (cardToPlay.name || '').toLowerCase() === 'tactical resurgence';
+
       addLog(`💫 COMBO! ${cardToPlay.name} gets +${cardToPlay.comboBonus} bonus!`, 'special');
-      
-      actualDamage = (cardToPlay.type === 'damage' || cardToPlay.damageValue > 0) ? actualDamage + cardToPlay.comboBonus : actualDamage; // Added check for damageValue > 0
-      actualShield = (cardToPlay.type === 'shield' || cardToPlay.shieldValue > 0) ? actualShield + cardToPlay.comboBonus : actualShield; // Added check for shieldValue > 0
-      actualHeal = (cardToPlay.type === 'heal' || cardToPlay.healValue > 0) ? actualHeal + cardToPlay.comboBonus : actualHeal; // Added check for healValue > 0
-      actualDrawCards += cardToPlay.comboBonus;
+
+      if (isTacticalResurgence) {
+        actualShield += cardToPlay.comboBonus;
+        hasConditionalShieldBonus = true;
+        addLog(`🛡️ ${cardToPlay.name}: Combo grants +${cardToPlay.comboBonus} Shield!`, 'buff');
+      } else {
+        actualDamage = (cardToPlay.type === 'damage' || cardToPlay.damageValue > 0) ? actualDamage + cardToPlay.comboBonus : actualDamage; // Added check for damageValue > 0
+        actualShield = (cardToPlay.type === 'shield' || cardToPlay.shieldValue > 0) ? actualShield + cardToPlay.comboBonus : actualShield; // Added check for shieldValue > 0
+        actualHeal = (cardToPlay.type === 'heal' || cardToPlay.healValue > 0) ? actualHeal + cardToPlay.comboBonus : actualHeal; // Added check for healValue > 0
+        actualDrawCards += cardToPlay.comboBonus;
+      }
     }
 
     // Apply debuff amplification if active
@@ -2044,6 +2065,7 @@ export default function Combat() {
       actualDrawCards = Math.floor(actualDrawCards * 2); // Also apply to draw cards if they have 'value'
     }
 
+    const existingNextCardDiscount = latestStateRef.current.tempBuffs.nextCardDiscount || 0;
     let finalCost = calculateCardCost(cardToPlay, latestStateRef.current); // Use cardToPlay here and latestStateRef.current
 
     if (cardToPlay.lokiDiscount) { // Use cardToPlay here
@@ -2100,6 +2122,13 @@ export default function Combat() {
 
     dispatch({ type: combatActions.USE_ENERGY, payload: { amount: finalCost } });
     dispatch({ type: combatActions.UPDATE_PLAYER, payload: { cardsPlayedThisTurn: (latestStateRef.current.player.cardsPlayedThisTurn || 0) + 1 } }); // Use latestStateRef.current
+
+    if (existingNextCardDiscount > 0) {
+      dispatch({
+        type: combatActions.UPDATE_TEMP_BUFFS,
+        payload: { nextCardDiscount: 0 }
+      });
+    }
 
     // Determine the charge stacks for the card as it goes to the discard pile.
     // By default, reset to 0, unless Ganesha's Calm Mind talent is active.
@@ -2374,7 +2403,7 @@ export default function Combat() {
       await processDamageEffects(cardToPlay, finalDamage, latestStateRef.current);
       
       // Apply bonus shield if present and card explicitly has shield property
-      if (actualShield > 0 && cardToPlay.shieldValue > 0) {
+      if (actualShield > 0 && (cardToPlay.shieldValue > 0 || hasConditionalShieldBonus)) {
         const finalShield = calculateShield(actualShield, latestStateRef.current);
         dispatch({ type: combatActions.GAIN_SHIELD, payload: { amount: finalShield } });
         addLog(`Gained ${finalShield} shield!`, 'shield');
@@ -2431,7 +2460,7 @@ export default function Combat() {
         }
         
         // Only apply bonus shield if card explicitly has shield property
-        if (actualShield > 0 && cardToPlay.shieldValue > 0) {
+        if (actualShield > 0 && (cardToPlay.shieldValue > 0 || hasConditionalShieldBonus)) {
           const finalShield = calculateShield(actualShield, latestStateRef.current);
           dispatch({ type: combatActions.GAIN_SHIELD, payload: { amount: finalShield } });
           addLog(`Gained ${finalShield} shield!`, 'shield');
@@ -2463,14 +2492,45 @@ export default function Combat() {
           });
           addLog(`${cardToPlay.name} failed to draw cards (value is 0)`, 'error');
         }
+      } else {
+        const normalizedCardName = (cardToPlay.name || '').toLowerCase();
+        const isEchoOfTheFallen = normalizedCardName === 'echo of the fallen' || normalizedCardName === 'echoes of the fallen';
+
+        if (isEchoOfTheFallen) {
+          if (actualDamage > 0) {
+            const finalDamage = calculateDamage({ ...cardToPlay, value: actualDamage }, latestStateRef.current, latestStateRef.current.enemy);
+            await processDamageEffects(cardToPlay, finalDamage, latestStateRef.current);
+          }
+
+          if (actualShield > 0) {
+            const finalShield = calculateShield(actualShield, latestStateRef.current);
+            dispatch({ type: combatActions.GAIN_SHIELD, payload: { amount: finalShield } });
+            addLog(`Gained ${finalShield} shield!`, 'shield');
+          }
+
+          if (actualHeal > 0) {
+            const finalHeal = calculateHealing(actualHeal, latestStateRef.current);
+            dispatch({ type: combatActions.HEAL_PLAYER, payload: { amount: finalHeal } });
+            addLog(`Healed ${finalHeal} HP!`, 'heal');
+          }
+
+          if (actualDrawCards > 0) {
+            drawCardsWithAbilities(actualDrawCards);
+            addLog(`Drew ${actualDrawCards} card${actualDrawCards !== 1 ? 's' : ''}!`, 'buff');
+          }
+        }
       }
 
-    if (cardToPlay.energyReturn && cardToPlay.energyReturn > 0) { // Use cardToPlay here
+    const hasFallenStar = latestStateRef.current.relics?.some(r => r.name === "Fallen Star");
+    const fallenStarEnergyReturn = hasFallenStar && cardToPlay.type === 'damage' ? 1 : 0;
+    const totalEnergyReturn = (cardToPlay.energyReturn || 0) + fallenStarEnergyReturn;
+
+    if (totalEnergyReturn > 0) {
       dispatch({
         type: combatActions.UPDATE_PLAYER,
-        payload: { energy: Math.min(latestStateRef.current.player.maxEnergy, latestStateRef.current.player.energy + cardToPlay.energyReturn) } // Use latestStateRef.current
+        payload: { energy: Math.min(latestStateRef.current.player.maxEnergy, latestStateRef.current.player.energy + totalEnergyReturn) } // Use latestStateRef.current
       });
-      addLog(`Gained ${cardToPlay.energyReturn} energy!`, 'buff');
+      addLog(`Gained ${totalEnergyReturn} energy!`, 'buff');
     }
 
     if (cardToPlay.discardCards && cardToPlay.discardCards > 0) { // Use cardToPlay here
@@ -3682,7 +3742,7 @@ export default function Combat() {
         athena_aegis_ascendant_turns_remaining: state.godState.athenaAegisAscendantTurnsRemaining,
         ganesha_enlightenment_active: state.godState.ganeshaEnlightenmentActive,
         ganesha_total_charge_stacks: state.godState.ganeshaTotalChargeStacks,
-        base_energy: state.player.maxEnergy,
+        base_energy: getPersistentBaseEnergy(state),
         player_burn_stacks: state.player.burnStacks,
         player_poison_stacks: state.player.poisonStacks,
         last_card_type_played: state.lastCardTypePlayed, // Save last card type played
@@ -3704,7 +3764,7 @@ export default function Combat() {
       console.error('[handleCardSelected] Error saving run:', error);
       addLog('Error saving progress', 'error');
     }
-  }, [state, navigate, dispatch, addLog, isMountedRef, isNavigating]);
+  }, [state, navigate, dispatch, addLog, isMountedRef, isNavigating, getPersistentBaseEnergy]);
 
   if (isLoading) { // Changed from isInitialLoad
     return (
