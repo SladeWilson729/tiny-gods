@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Card, CardContent } from '@/components/ui/card';
-import { Trophy, Medal, Award, Loader2, Crown, RefreshCw, User, Star } from 'lucide-react';
+import { Trophy, Medal, Award, Loader2, Crown, RefreshCw, User, Star, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { motion } from 'framer-motion';
@@ -149,6 +149,17 @@ export default function Leaderboard() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8 relative"
         >
+          <div className="absolute top-0 left-0">
+            <Button
+              onClick={() => navigate(-1)}
+              variant="outline"
+              className="bg-black/60 backdrop-blur-sm border-amber-500 text-amber-300 hover:bg-amber-500/20 hover:text-white"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
+            </Button>
+          </div>
+
           <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-amber-400 mb-4">
             Hall of Legends
           </h1>

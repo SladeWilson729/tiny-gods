@@ -107,7 +107,7 @@ export default function CardRemovalModal({ open, onCardRemoved, onSkip, deck, go
             Remove Up To {maxRemovals} Cards
           </DialogTitle>
           <DialogDescription className="text-lg text-gray-300">
-            Choose up to {maxRemovals} cards to permanently remove. Click to select, right-click to deselect!
+            Choose up to {maxRemovals} cards to permanently remove. Click to toggle selection (or right-click to deselect)!
           </DialogDescription>
         </DialogHeader>
 
@@ -130,7 +130,11 @@ export default function CardRemovalModal({ open, onCardRemoved, onSkip, deck, go
                   onMouseDown={(e) => {
                     e.preventDefault(); // Prevent default browser behavior (e.g., text selection)
                     if (e.button === 0) { // Left-click
-                      handleSelectCard(card);
+                      if (selected > 0) {
+                        handleDeselectCard(card);
+                      } else {
+                        handleSelectCard(card);
+                      }
                     } else if (e.button === 2) { // Right-click
                       handleDeselectCard(card);
                     }
