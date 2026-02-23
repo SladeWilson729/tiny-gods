@@ -2492,6 +2492,33 @@ export default function Combat() {
           });
           addLog(`${cardToPlay.name} failed to draw cards (value is 0)`, 'error');
         }
+      } else {
+        const normalizedCardName = (cardToPlay.name || '').toLowerCase();
+        const isEchoOfTheFallen = normalizedCardName === 'echo of the fallen' || normalizedCardName === 'echoes of the fallen';
+
+        if (isEchoOfTheFallen) {
+          if (actualDamage > 0) {
+            const finalDamage = calculateDamage({ ...cardToPlay, value: actualDamage }, latestStateRef.current, latestStateRef.current.enemy);
+            await processDamageEffects(cardToPlay, finalDamage, latestStateRef.current);
+          }
+
+          if (actualShield > 0) {
+            const finalShield = calculateShield(actualShield, latestStateRef.current);
+            dispatch({ type: combatActions.GAIN_SHIELD, payload: { amount: finalShield } });
+            addLog(`Gained ${finalShield} shield!`, 'shield');
+          }
+
+          if (actualHeal > 0) {
+            const finalHeal = calculateHealing(actualHeal, latestStateRef.current);
+            dispatch({ type: combatActions.HEAL_PLAYER, payload: { amount: finalHeal } });
+            addLog(`Healed ${finalHeal} HP!`, 'heal');
+          }
+
+          if (actualDrawCards > 0) {
+            drawCardsWithAbilities(actualDrawCards);
+            addLog(`Drew ${actualDrawCards} card${actualDrawCards !== 1 ? 's' : ''}!`, 'buff');
+          }
+        }
       }
 
     const hasFallenStar = latestStateRef.current.relics?.some(r => r.name === "Fallen Star");
