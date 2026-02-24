@@ -1,0 +1,26 @@
+{
+  "gods": [
+    {
+      "id": "atlas_prime",
+      "name": "Atlas Prime",
+      "baseHealth": 85,
+      "baseEnergy": 3,
+      "passiveDescription": "First card each turn gains +2 value.",
+      "starterCardIds": ["strike", "strike", "guard", "guard", "echo_blast"]
+    },
+    {
+      "id": "nym_temporal",
+      "name": "Nym Temporal",
+      "baseHealth": 75,
+      "baseEnergy": 4,
+      "passiveDescription": "Every third card refunds 1 energy.",
+      "starterCardIds": ["strike", "guard", "phase_shift", "echo_blast", "echo_blast"]
+    }
+  ],
+  "cards": [
+    { "id": "strike", "name": "Chrono Strike", "type": "Attack", "target": "Enemy", "energyCost": 1, "value": 6, "effectText": "Deal damage." },
+    { "id": "guard", "name": "Epoch Guard", "type": "Skill", "target": "Self", "energyCost": 1, "value": 5, "effectText": "Restore health placeholder for block model." },
+    { "id": "echo_blast", "name": "Echo Blast", "type": "Attack", "target": "Enemy", "energyCost": 2, "value": 12, "effectText": "Heavy damage." },
+    { "id": "phase_shift", "name": "Phase Shift", "type": "Skill", "target": "Self", "energyCost": 1, "value": 8, "effectText": "Heal and prep combo." }
+  ]
+}
