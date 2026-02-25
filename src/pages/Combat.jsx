@@ -160,6 +160,9 @@ export default function Combat() {
     if (god.name === 'Thor' && godTalents?.tier1 === 'asgardian_vigor') {
       maxHealth += 15;
     }
+    if (god.name === 'Anubis' && godTalents?.tier1 === 'eternal_guardian') {
+      maxHealth += 20;
+    }
     if (god.name === 'Ra' && godTalents?.tier1 === 'sun_blessing') {
       maxHealth += 20;
     }
@@ -270,6 +273,12 @@ export default function Combat() {
       const newHealth = Math.min(state.player.health + healAmount, state.player.maxHealth);
       dispatch({ type: combatActions.UPDATE_PLAYER, payload: { health: newHealth } });
       addLog('🧪 Vial of Ichor: Restored 15 HP!', 'heal');
+    }
+
+    // Anubis Static Ability: Heal 2 Health on enemy defeat
+    if (state.god?.name === 'Anubis') {
+      dispatch({ type: combatActions.HEAL_PLAYER, payload: { amount: 2 } });
+      addLog('⚖️ Anubis Soul Return: +2 Health on victory!', 'heal');
     }
 
     let baronSamediLaughBonus = false;
@@ -840,6 +849,12 @@ export default function Combat() {
           console.log('[Combat] Ra Eternal Sun: +5 HP at battle start');
         }
 
+        // Zeus Tier 3: God King - Heal 5 Health at start of each battle
+        if (godData.name === 'Zeus' && godTalents?.tier3 === 'god_king') {
+          baseHealth = Math.min(baseHealth + 5, baseMaxHealth);
+          addLog('❤️ Zeus God King: +5 Health at battle start!', 'heal');
+        }
+
         // Calculate base energy
         let baseEnergy = runData.run_data?.base_energy ?? godData.baseEnergy ?? 3;
         
@@ -852,6 +867,12 @@ export default function Combat() {
 
         // Add bonus energy from relics (e.g., Pure Gold, Berserker Harness)
         baseEnergy += calculateBonusEnergy({ relics: playerRelics });
+
+        // Zeus Tier 1: Storm Caller - Start each battle with +1 Energy
+        if (godData.name === 'Zeus' && godTalents?.tier1 === 'storm_caller') {
+          baseEnergy += 1;
+          addLog('🌩️ Zeus Storm Caller: +1 Energy at battle start!', 'buff');
+        }
 
         // Bag of Holding reduces max energy by 1
         // NOTE: This penalty should only be counted if not already applied to base_energy
@@ -1013,11 +1034,7 @@ export default function Combat() {
           addLog('🌑🛡️ Void Shield: +8 Shield!', 'buff');
         }
 
-        // Anubis Tier 1: Eternal Guardian - Start with 10 Shield
-        if (godData.name === 'Anubis' && godTalents?.tier1 === 'eternal_guardian') {
-          battleStartShield += 10;
-          addLog('💀🛡️ Eternal Guardian: +10 Shield!', 'buff');
-        }
+        // Anubis Tier 1: Eternal Guardian - +20 Max Health (handled in calculateMaxHealth)
 
         // Athena Tier 1: Shield Readiness - Start with 8 Shield
         if (godData.name === 'Athena' && godTalents?.tier1 === 'shield_readiness') {
@@ -1235,6 +1252,10 @@ export default function Combat() {
       console.log(`[calculateDamage] Anubis Death's Touch: Player HP ${state.player.health}/${state.player.maxHealth}, bonus: ${bonusDamage}`);
     } else {
       console.log(`[calculateDamage] Anubis Death's Touch: Player HP ${state.player.health}/${state.player.maxHealth} > 50% HP.`);
+    }
+
+    if (state.god?.name === 'Anubis' && state.godTalents?.tier1 === 'death_touch') {
+      damage += 3;
     }
 
     if (state.god?.name === 'Cthulhu' && state.godTalents?.tier1 === 'cosmic_horror') {
@@ -1574,6 +1595,12 @@ export default function Combat() {
       addLog('☀️ Ra Solar Regeneration: +5 HP!', 'heal');
     }
 
+    // Zeus Tier 3: Olympian Wrath - Deal 3 damage to enemy at start of each turn
+    if (state.god?.name === 'Zeus' && state.godTalents?.tier3 === 'olympian_wrath') {
+      dispatch({ type: combatActions.DAMAGE_ENEMY, payload: { amount: 3 } });
+      addLog('⚡👑 Zeus Olympian Wrath: Enemy takes 3 damage!', 'damage');
+    }
+
     dispatch({ type: combatActions.UPDATE_TEMP_BUFFS, payload: { thunderStoneUsed: false } });
 
     if (state.god?.name === 'Susanoo' && state.godTalents?.tier1 === 'ocean_s_might') {
@@ -1646,6 +1673,20 @@ export default function Combat() {
       drawCardsWithAbilities(1);
       cardsDrawnThisTurn += 1;
       addLog('🐍 Quetzalcoatl Serpent\'s Wisdom: Draw +1 card', 'buff');
+    }
+
+    // Odin Tier 1: Allfather's Wisdom - Draw 1 extra card (in addition to the static ability)
+    if (state.god?.name === 'Odin' && state.godTalents?.tier1 === 'allfather_wisdom') {
+      drawCardsWithAbilities(1);
+      cardsDrawnThisTurn += 1;
+      addLog('📖 Odin Allfather\'s Wisdom: Draw +1 extra card!', 'buff');
+    }
+
+    // Odin Tier 2: Raven's Insight - Draw 2 extra cards at start of each turn
+    if (state.god?.name === 'Odin' && state.godTalents?.tier2 === 'ravens_insight') {
+      drawCardsWithAbilities(2);
+      cardsDrawnThisTurn += 2;
+      addLog('🐦‍⬛ Odin Raven\'s Insight: Draw +2 extra cards!', 'buff');
     }
 
     console.log('[startNewTurn] Checking Thor Lightning Reflexes...');
@@ -1879,6 +1920,12 @@ export default function Combat() {
       dispatch({ type: combatActions.HEAL_PLAYER, payload: { amount: soulHealAmount } });
       addLog(`💀 ${currentCombatState.godTalents?.tier3 === 'judge_of_souls' ? 'Judge of Souls' : 'Anubis Soul Harvest'}: Healed ${soulHealAmount} HP!`, 'buff');
       console.log('[playCard] Anubis healed', soulHealAmount, 'HP from Soul Harvest/Judge of Souls');
+    }
+
+    // Anubis Tier 2: Life Drain - Heal 5 HP whenever you play a damage card
+    if (currentCombatState.god?.name === 'Anubis' && currentCombatState.godTalents?.tier2 === 'life_drain') {
+      dispatch({ type: combatActions.HEAL_PLAYER, payload: { amount: 5 } });
+      addLog('❤️⚡ Anubis Life Drain: +5 HP from damage card!', 'heal');
     }
 
     if (currentCombatState.god?.name === 'Loki' && currentCombatState.godTalents?.tier1 === 'illusory_defense') {
@@ -2539,6 +2586,13 @@ export default function Combat() {
         if (latestStateRef.current.deck.hand.length > 0) { // Use latestStateRef.current
           const randomCard = latestStateRef.current.deck.hand[Math.floor(Math.random() * latestStateRef.current.deck.hand.length)]; // Use latestStateRef.current
           dispatch({ type: combatActions.DISCARD_CARD, payload: { card: randomCard } });
+          if (staticHandlers.onCardDiscarded) {
+            try {
+              staticHandlers.onCardDiscarded({ card: randomCard, state: latestStateRef.current, dispatch, addLog });
+            } catch (e) {
+              console.error('[playCard] Error in onCardDiscarded handler:', e);
+            }
+          }
         }
       }
       addLog(`Discarded ${cardsToDiscard} card${cardsToDiscard !== 1 ? 's' : ''}!`, 'info');
@@ -3096,6 +3150,21 @@ export default function Combat() {
       }
     }
 
+    // Anubis Tier 3: Eternal Curse - Enemies take 5 damage at the start of their turn
+    if (state.god?.name === 'Anubis' && state.godTalents?.tier3 === 'eternal_curse') {
+      dispatch({ type: combatActions.DAMAGE_ENEMY, payload: { amount: 5 } });
+      addLog('💀⚡ Anubis Eternal Curse: Enemy takes 5 damage!', 'damage');
+      await new Promise(resolve => setTimeout(resolve, 400));
+      if (!isMountedRef.current || isNavigating) {
+        dispatch({ type: combatActions.SET_ANIMATING, payload: false });
+        return;
+      }
+      if (latestStateRef.current.enemy.health <= 0) {
+        handleVictoryAndProgressRun();
+        return;
+      }
+    }
+
     // Cthulhu Cosmic Dread
     if (state.god?.name === 'Cthulhu' && state.godTalents?.tier3 === 'cosmic_dread') {
       if (state.enemy.isVulnerable) {
@@ -3274,6 +3343,13 @@ export default function Combat() {
                 const discardedCard = state.deck.hand[randomCardIndex];
                 dispatch({ type: combatActions.DISCARD_CARD, payload: { card: discardedCard } });
                 addLog(`🫨 You discarded ${discardedCard.name}!`, 'enemy');
+                if (staticHandlers.onCardDiscarded) {
+                  try {
+                    staticHandlers.onCardDiscarded({ card: discardedCard, state: latestStateRef.current, dispatch, addLog });
+                  } catch (e) {
+                    console.error('[endTurn] Error in onCardDiscarded handler:', e);
+                  }
+                }
             }
             const previousPlayerHealth = latestStateRef.current.player.health;
             dispatch({ type: combatActions.DAMAGE_PLAYER, payload: { amount: 10 } });

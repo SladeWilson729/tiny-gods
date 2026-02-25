@@ -60,7 +60,7 @@ const GOD_TALENTS = {
     }
   },
   Zeus: {
-    static_ability: "Every time you deal damage, there's a 10% chance to deal 2 bonus damage.",
+    static_ability: "Conduit of Power: Every 3rd attack card you play grants +1 Energy and makes the enemy Vulnerable.",
     tier1: {
       lightning_surge: {
         name: "Lightning Surge",
@@ -179,7 +179,7 @@ const GOD_TALENTS = {
     tier1: {
       soul_harvest: {
         name: "Soul Harvest",
-        description: "Heal 5 Health after each battle.",
+        description: "Heal 50% of damage dealt whenever you deal damage.",
         icon: "💀❤️"
       },
       eternal_guardian: {
@@ -649,7 +649,7 @@ const GOD_TALENTS = {
     }
   },
   Odin: {
-    static_ability: "Gain 1 Energy at the start of battle.",
+    static_ability: "Allfather's Wisdom: Draw 1 extra card at the start of each turn.",
     tier1: {
       runes_of_power: {
         name: "Runes of Power",

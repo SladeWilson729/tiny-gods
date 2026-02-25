@@ -308,6 +308,28 @@ export function calculateCardCost(card, state) {
       cost -= 1;
     }
   }
+
+  // Zeus Tier 2: Divine Authority - All damage cards cost 1 less
+  if (state.god?.name === 'Zeus' && state.godTalents?.tier2 === 'divine_authority') {
+    if (card.type === 'damage') {
+      cost -= 1;
+    }
+  }
+
+  // Zeus Tier 3: Storm Lord - Every 3rd attack card costs 0
+  if (state.god?.name === 'Zeus' && state.godTalents?.tier3 === 'storm_lord' && card.type === 'damage') {
+    const zeusAttacksPlayed = state.godState?.zeusAttacksPlayed || 0;
+    if ((zeusAttacksPlayed + 1) % 3 === 0) {
+      cost = 0;
+    }
+  }
+
+  // Hades Tier 3: Eternal Darkness - All attack cards cost 1 less
+  if (state.god?.name === 'Hades' && state.godTalents?.tier3 === 'eternal_darkness') {
+    if (card.type === 'damage') {
+      cost -= 1;
+    }
+  }
   
   // God discounts
   if (card.lokiDiscount) {

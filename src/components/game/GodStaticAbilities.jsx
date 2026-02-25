@@ -27,6 +27,15 @@ export const createStaticAbilityHandlers = (godName) => {
           });
           addLog('⚡ Zeus Conduit of Power: +1 Energy and Enemy Vulnerable!', 'buff');
         }
+
+        // Tier 2: Chain Lightning - After dealing damage 3 times in one turn, deal 10 bonus damage
+        if (state.godTalents?.tier2 === 'chain_lightning' && newCount === 3) {
+          dispatch({
+            type: 'DAMAGE_ENEMY',
+            payload: { amount: 10 }
+          });
+          addLog('⚡⚡ Zeus Chain Lightning: 10 bonus damage!', 'special');
+        }
       },
       onTurnEnd: (context) => {
         const { dispatch } = context;
@@ -232,7 +241,16 @@ export const createStaticAbilityHandlers = (godName) => {
       }
     },
 
-    Hades: {},
+    Hades: {
+      onTurnStart: (context) => {
+        const { dispatch, addLog } = context;
+        dispatch({
+          type: 'DAMAGE_ENEMY',
+          payload: { amount: 1 }
+        });
+        addLog('💀 Hades Underworld Grip: Enemy loses 1 Health!', 'debuff');
+      }
+    },
 
     Anubis: {
       onTurnEnd: (context) => {
@@ -339,6 +357,14 @@ export const createStaticAbilityHandlers = (godName) => {
     },
 
     Quetzalcoatl: {
+      onCardDiscarded: (context) => {
+        const { dispatch, addLog } = context;
+        dispatch({
+          type: 'GAIN_SHIELD',
+          payload: { amount: 1 }
+        });
+        addLog('🪶 Quetzalcoatl Wind Blessing: Gained 1 Shield from discarding!', 'buff');
+      },
       onCardDrawn: (context) => {
         const { card, addLog } = context;
         
@@ -427,7 +453,7 @@ export const createStaticAbilityHandlers = (godName) => {
         }
         
         // Tier 3: Tactical Supremacy - Draw 2 cards if 15+ Shield
-        if (state.godTalents?.tier3 === 'tactical_ Supremacy' && state.player.shield >= 15) {
+        if (state.godTalents?.tier3 === 'tactical_supremacy' && state.player.shield >= 15) {
           dispatch({
             type: 'DRAW_CARDS',
             payload: { count: 2 }
