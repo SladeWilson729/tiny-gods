@@ -1973,6 +1973,13 @@ export default function Combat() {
       actualHeal = cardToPlay.value || 0;
     } else if (cardToPlay.type === 'draw' && !actualDrawCards) { // If it's a draw card and actualDrawCards is 0
       actualDrawCards = cardToPlay.value || 0;
+    } else {
+      // For cards with non-standard types (e.g. Echo of the Fallen), use 'value' as the primary damage
+      // when no specific damageValue was set.
+      const _echoName = (cardToPlay.name || '').toLowerCase();
+      if ((_echoName === 'echo of the fallen' || _echoName === 'echoes of the fallen') && !actualDamage) {
+        actualDamage = cardToPlay.value || 0;
+      }
     }
     // End of modified section
 
